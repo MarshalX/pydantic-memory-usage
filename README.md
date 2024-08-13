@@ -127,3 +127,44 @@ Line #    Mem usage    Increment  Occurrences   Line Contents
      5                                         def main() -> None:
      6    123.6 MiB    105.2 MiB           1       import models  # noqa
 ```
+
+## Results with `skip caching parent namespaces`
+
+### time
+
+time python main.py (with commented `@profile`):
+```text
+python main.py  1.10s user 0.06s system 90% cpu 1.280 total
+python main.py  0.99s user 0.05s system 98% cpu 1.048 total
+python main.py  1.06s user 0.05s system 98% cpu 1.120 total
+python main.py  0.95s user 0.05s system 98% cpu 1.012 total
+```
+(4 runs)
+
+### mprof
+
+![results_new 2.png](results_new_2.png)
+
+```text
+Filename: blabla/projects/pydantic-memory-usage/models/models_loader.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+    29     44.4 MiB     44.4 MiB           1   @profile
+    30                                         def __rebuild_all_models() -> None:
+    31                                             # load models to the scope
+    32     44.4 MiB      0.0 MiB           1       import models  # noqa
+    33     44.4 MiB      0.0 MiB           1       from models.unknown_type import UnknownType, UnknownInputType  # noqa
+    34                                         
+    35    129.2 MiB      0.0 MiB         369       for __model in __get_models_to_rebuild_set():
+    36    129.2 MiB     84.8 MiB         368           __model.model_rebuild()
+
+
+Filename: blabla/projects/pydantic-memory-usage/main.py
+
+Line #    Mem usage    Increment  Occurrences   Line Contents
+=============================================================
+     4     18.2 MiB     18.2 MiB           1   @profile
+     5                                         def main() -> None:
+     6    129.2 MiB    111.0 MiB           1       import models  # noqa
+```
