@@ -22,7 +22,7 @@ Run the command:
 mprof run python -m main && mprof plot -o mprofile.png
 ```
 
-## Results
+## Results with `2.8.2`
 
 ### Used pydantic
 
@@ -39,9 +39,13 @@ mprof run python -m main && mprof plot -o mprofile.png
 
 ### time
 
-time python main.py (with commented `@profile`):
+5 runs of `time python main.py` (with commented `@profile`):
 ```text
-python main.py  1.25s user 0.06s system 99% cpu 1.317 total
+python main.py  1.39s user 0.07s system 82% cpu 1.776 total
+python main.py  1.32s user 0.05s system 97% cpu 1.402 total
+python main.py  1.43s user 0.07s system 97% cpu 1.526 total
+python main.py  1.38s user 0.06s system 99% cpu 1.444 total
+python main.py  1.30s user 0.06s system 98% cpu 1.378 total
 ```
 
 ### mprof
@@ -72,33 +76,31 @@ Line #    Mem usage    Increment  Occurrences   Line Contents
      6    121.3 MiB    102.8 MiB           1       import models  # noqa
 ```
 
-## Results with `experimental_fast_build` 
-
-I've added `experimental_fast_build=True` to the `model_config` in `base.py`.
+## Results with `2.9.0` 
 
 ### Used pydantic
 
 ```text
-             pydantic version: 2.9.0a1
-        pydantic-core version: 2.21.0
+             pydantic version: 2.9.0
+        pydantic-core version: 2.23.2
           pydantic-core build: profile=release pgo=false
                  install path: blabla/projects/pydantic-memory-usage/venv/lib/python3.9/site-packages/pydantic
                python version: 3.9.6 (default, Mar 29 2024, 10:51:09)  [Clang 15.0.0 (clang-1500.3.9.4)]
-                     platform: macOS-14.6-arm64-arm-64bit
+                     platform: macOS-14.6.1-arm64-arm-64bit
              related packages: typing_extensions-4.12.2
                        commit: unknown
 ```
 
 ### time
 
-time python main.py (with commented `@profile`):
+5 runs of `time python main.py` (with commented `@profile`):
 ```text
-python main.py  0.97s user 0.06s system 94% cpu 1.081 total
-python main.py  0.94s user 0.04s system 99% cpu 0.987 total
-python main.py  1.11s user 0.05s system 98% cpu 1.180 total
-python main.py  0.97s user 0.04s system 99% cpu 1.022 total
+python main.py  1.13s user 0.08s system 81% cpu 1.483 total
+python main.py  1.03s user 0.06s system 97% cpu 1.116 total
+python main.py  1.16s user 0.06s system 97% cpu 1.256 total
+python main.py  1.11s user 0.06s system 97% cpu 1.209 total
+python main.py  1.04s user 0.06s system 98% cpu 1.118 total
 ```
-(4 runs)
 
 ### mprof
 
@@ -109,62 +111,21 @@ Filename: blabla/projects/pydantic-memory-usage/models/models_loader.py
 
 Line #    Mem usage    Increment  Occurrences   Line Contents
 =============================================================
-    29     43.1 MiB     43.1 MiB           1   @profile
+    29     49.0 MiB     49.0 MiB           1   @profile
     30                                         def __rebuild_all_models() -> None:
     31                                             # load models to the scope
-    32     43.1 MiB      0.0 MiB           1       import models  # noqa
-    33     43.2 MiB      0.0 MiB           1       from models.unknown_type import UnknownType, UnknownInputType  # noqa
-    34                                         
-    35    123.6 MiB      0.0 MiB         369       for __model in __get_models_to_rebuild_set():
-    36    123.6 MiB     80.4 MiB         368           __model.model_rebuild()
-
-
-Filename: blabla/projects/pydantic-memory-usage/main.py
-
-Line #    Mem usage    Increment  Occurrences   Line Contents
-=============================================================
-     4     18.4 MiB     18.4 MiB           1   @profile
-     5                                         def main() -> None:
-     6    123.6 MiB    105.2 MiB           1       import models  # noqa
-```
-
-## Results with `skip caching parent namespaces`
-
-### time
-
-time python main.py (with commented `@profile`):
-```text
-python main.py  1.10s user 0.06s system 90% cpu 1.280 total
-python main.py  0.99s user 0.05s system 98% cpu 1.048 total
-python main.py  1.06s user 0.05s system 98% cpu 1.120 total
-python main.py  0.95s user 0.05s system 98% cpu 1.012 total
-```
-(4 runs)
-
-### mprof
-
-![results_new 2.png](results_new_2.png)
-
-```text
-Filename: blabla/projects/pydantic-memory-usage/models/models_loader.py
-
-Line #    Mem usage    Increment  Occurrences   Line Contents
-=============================================================
-    29     44.4 MiB     44.4 MiB           1   @profile
-    30                                         def __rebuild_all_models() -> None:
-    31                                             # load models to the scope
-    32     44.4 MiB      0.0 MiB           1       import models  # noqa
-    33     44.4 MiB      0.0 MiB           1       from models.unknown_type import UnknownType, UnknownInputType  # noqa
+    32     49.0 MiB      0.0 MiB           1       import models  # noqa
+    33     49.0 MiB      0.0 MiB           1       from models.unknown_type import UnknownType, UnknownInputType  # noqa
     34                                         
     35    129.2 MiB      0.0 MiB         369       for __model in __get_models_to_rebuild_set():
-    36    129.2 MiB     84.8 MiB         368           __model.model_rebuild()
+    36    129.2 MiB     80.2 MiB         368           __model.model_rebuild()
 
 
 Filename: blabla/projects/pydantic-memory-usage/main.py
 
 Line #    Mem usage    Increment  Occurrences   Line Contents
 =============================================================
-     4     18.2 MiB     18.2 MiB           1   @profile
+     4     19.4 MiB     19.4 MiB           1   @profile
      5                                         def main() -> None:
-     6    129.2 MiB    111.0 MiB           1       import models  # noqa
+     6    129.3 MiB    109.8 MiB           1       import models  # noqa
 ```
